@@ -31,25 +31,25 @@ public final class Store<State: Equatable, Action, Environment>: ObservableObjec
             .store(in: &cancellables)
     }
 
-    public func derived<DerivedState: Equatable, DerivedAction>(
+    public func derived<DerivedState: Equatable, ExtractedAction>(
         deriveState: @escaping (State) -> DerivedState,
-        deriveAction: @escaping (DerivedAction) -> Action
-    ) -> Store<DerivedState, DerivedAction, Environment> {
-        let store = Store<DerivedState, DerivedAction, Environment>(
+        embedAction: @escaping (ExtractedAction) -> Action
+    ) -> Store<DerivedState, ExtractedAction, Environment> {
+        let store = Store<DerivedState, ExtractedAction, Environment>(
             initialState: deriveState(state),
             reducer: { _, action, _ in
-                self.send(deriveAction(action))
+                self.send(embedAction(action))
                 return Empty(completeImmediately: true)
                     .eraseToAnyPublisher()
             },
             environment: environment
         )
 
-        store.derivedCancellable = $state
+        $state
             .map(deriveState)
             .removeDuplicates()
-            .sink { [weak store] in store?.state = $0 }
-
+            .receive(on: DispatchQueue.main)
+            .assign(to: &store.$state)
         return store
     }
 

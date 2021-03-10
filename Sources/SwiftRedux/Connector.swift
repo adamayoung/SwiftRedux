@@ -16,7 +16,7 @@ public extension Store {
 
     func connect<C: Connector>(
         using connector: C
-    ) -> Store<C.ViewState, C.ViewAction, Environment> where C.State == State, C.Action == Action {
+    ) -> Store<C.ViewState, C.ViewAction> where C.State == State, C.Action == Action {
         derived(
             deriveState: connector.connect(state: ),
             embedAction: connector.connect(action: )

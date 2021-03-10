@@ -9,11 +9,11 @@ public struct Prism<Source, Target> {
 public struct Reducer<State, Action, Environment> {
 
     let reduce: (inout State, Action, Environment) -> AnyPublisher<Action, Never>
-    
+
     public init(reduce: @escaping (inout State, Action, Environment) -> AnyPublisher<Action, Never>) {
         self.reduce = reduce
     }
-    
+
     func callAsFunction(
         _ state: inout State,
         _ action: Action,
@@ -21,7 +21,7 @@ public struct Reducer<State, Action, Environment> {
     ) -> AnyPublisher<Action, Never> {
         reduce(&state, action, environment)
     }
-    
+
     func indexed<IndexedState, IndexedAction, IndexedEnvironment, Key>(
         keyPath: WritableKeyPath<IndexedState, [Key: State]>,
         prism: Prism<IndexedAction, (Key, Action)>,
@@ -39,7 +39,7 @@ public struct Reducer<State, Action, Environment> {
                 .eraseToAnyPublisher()
         }
     }
-    
+
     func indexed<IndexedState, IndexedAction, IndexedEnvironment>(
         keyPath: WritableKeyPath<IndexedState, [State]>,
         prism: Prism<IndexedAction, (Int, Action)>,
@@ -56,7 +56,7 @@ public struct Reducer<State, Action, Environment> {
                 .eraseToAnyPublisher()
         }
     }
-    
+
     func optional() -> Reducer<State?, Action, Environment> {
         .init { state, action, environment in
             if state != nil {
@@ -66,7 +66,7 @@ public struct Reducer<State, Action, Environment> {
             }
         }
     }
-    
+
     func lift<LiftedState, LiftedAction, LiftedEnvironment>(
         keyPath: WritableKeyPath<LiftedState, State>,
         prism: Prism<LiftedAction, Action>,
@@ -81,7 +81,7 @@ public struct Reducer<State, Action, Environment> {
             return effect.map(prism.embed).eraseToAnyPublisher()
         }
     }
-    
+
     static func combine(_ reducers: Reducer...) -> Reducer {
         .init { state, action, environment in
             let effects = reducers.compactMap { $0(&state, action, environment) }

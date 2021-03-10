@@ -67,7 +67,7 @@ public final class Store<State, Action>: ObservableObject {
 
         return store
     }
-    
+
     public func binding<Value>(
             for keyPath: KeyPath<State, Value>,
             toAction: @escaping (Value) -> Action
@@ -77,5 +77,17 @@ public final class Store<State, Action>: ObservableObject {
                 set: { self.send(toAction($0)) }
             )
         }
+
+}
+
+extension Store {
+
+    public static func stub(with state: State) -> Store {
+        Store(
+            initialState: state,
+            reducer: Reducer { _, _, _ in Empty<Action, Never>().eraseToAnyPublisher() },
+            environment: ()
+        )
+    }
 
 }

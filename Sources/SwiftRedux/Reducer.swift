@@ -14,7 +14,7 @@ public struct Reducer<State, Action, Environment> {
         self.reduce = reduce
     }
 
-    func callAsFunction(
+    public func callAsFunction(
         _ state: inout State,
         _ action: Action,
         _ environment: Environment
@@ -22,7 +22,7 @@ public struct Reducer<State, Action, Environment> {
         reduce(&state, action, environment)
     }
 
-    func indexed<IndexedState, IndexedAction, IndexedEnvironment, Key>(
+    public func indexed<IndexedState, IndexedAction, IndexedEnvironment, Key>(
         keyPath: WritableKeyPath<IndexedState, [Key: State]>,
         prism: Prism<IndexedAction, (Key, Action)>,
         extractEnvironment: @escaping (IndexedEnvironment) -> Environment
@@ -40,7 +40,7 @@ public struct Reducer<State, Action, Environment> {
         }
     }
 
-    func indexed<IndexedState, IndexedAction, IndexedEnvironment>(
+    public func indexed<IndexedState, IndexedAction, IndexedEnvironment>(
         keyPath: WritableKeyPath<IndexedState, [State]>,
         prism: Prism<IndexedAction, (Int, Action)>,
         extractEnvironment: @escaping (IndexedEnvironment) -> Environment
@@ -57,7 +57,7 @@ public struct Reducer<State, Action, Environment> {
         }
     }
 
-    func optional() -> Reducer<State?, Action, Environment> {
+    public func optional() -> Reducer<State?, Action, Environment> {
         .init { state, action, environment in
             if state != nil {
                 return self(&state!, action, environment)
@@ -67,7 +67,7 @@ public struct Reducer<State, Action, Environment> {
         }
     }
 
-    func lift<LiftedState, LiftedAction, LiftedEnvironment>(
+    public func lift<LiftedState, LiftedAction, LiftedEnvironment>(
         keyPath: WritableKeyPath<LiftedState, State>,
         prism: Prism<LiftedAction, Action>,
         extractEnvironment: @escaping (LiftedEnvironment) -> Environment
@@ -82,7 +82,7 @@ public struct Reducer<State, Action, Environment> {
         }
     }
 
-    static func combine(_ reducers: Reducer...) -> Reducer {
+    public static func combine(_ reducers: Reducer...) -> Reducer {
         .init { state, action, environment in
             let effects = reducers.compactMap { $0(&state, action, environment) }
             return Publishers.MergeMany(effects).eraseToAnyPublisher()

@@ -14,10 +14,6 @@ let package = Package(
         .library(name: "SwiftRedux", targets: ["SwiftRedux"])
     ],
 
-    dependencies: [
-        .package(url: "https://github.com/realm/SwiftLint.git", from: "0.43.0")
-    ],
-
     targets: [
         .target(name: "SwiftRedux", dependencies: []),
         .testTarget(name: "SwiftReduxTests", dependencies: ["SwiftRedux"])
